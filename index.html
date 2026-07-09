@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RTX Rent Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <section class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="brand big"><div class="brand-logo"><img src="assets/rtx-logo-icon.png" alt="RTX Logo"></div><div><h1>RTX Management</h1><p>Kirayedar, rent, bill aur reading manager</p></div></div>
+      <form id="loginForm" class="login-form">
+        <label>Admin PIN<input id="pinInput" type="password" placeholder="Enter Admin PIN" autocomplete="current-password" /></label>
+        <button class="primary-btn" type="submit">Login</button>
+        <p class="muted">PIN browser me local security ke liye hai. Firebase rules zaroor secure karna.</p>
+      </form>
+    </div>
+  </section>
+
+  <div class="app hidden" id="appRoot">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="brand-logo"><img src="assets/rtx-logo-icon.png" alt="RTX Logo"></div><div><h1>RTX Manager</h1><p>Rent System</p></div></div>
+      <nav>
+        <button class="nav-btn active" data-page="dashboard">🏠 Dashboard</button>
+        <button class="nav-btn" data-page="tenants">👥 Kirayedar</button>
+        <button class="nav-btn" data-page="rooms">🚪 Rooms</button>
+        <button class="nav-btn" data-page="rent">💰 Rent</button>
+        <button class="nav-btn" data-page="electricity">⚡ Electricity</button>
+        <button class="nav-btn" data-page="charges">🧾 Other Bills</button>
+        <button class="nav-btn" data-page="reports">📊 Reports</button>
+        <button class="nav-btn" data-page="backup">☁️ Backup</button>
+      </nav>
+      <div class="sidebar-footer"><span id="dbStatus">Connecting...</span><button class="logout-btn" id="logoutBtn">Logout</button></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menuBtn">☰</button>
+        <div class="topbar-title"><img src="assets/rtx-logo-icon.png" alt="RTX Logo"><div><h2 id="pageTitle">Dashboard</h2><p id="pageSub">Complete room, tenant, rent, meter and bill record.</p></div></div>
+        <div class="top-actions"><button class="ghost-btn" id="printBtn">Print</button><button class="primary-btn" data-page-jump="tenants">+ Add Tenant</button></div>
+      </header>
+
+      <section class="page active" id="dashboard">
+        <div class="stats-grid">
+          <div class="stat-card"><p>Total Rooms</p><h3 id="stRooms">0</h3></div>
+          <div class="stat-card"><p>Occupied</p><h3 id="stOccupied">0</h3></div>
+          <div class="stat-card"><p>Active Tenants</p><h3 id="stTenants">0</h3></div>
+          <div class="stat-card"><p>Rent Received</p><h3 id="stRentPaid">₹0</h3></div>
+          <div class="stat-card warning"><p>Total Pending</p><h3 id="stPending">₹0</h3></div>
+          <div class="stat-card"><p>This Month Collection</p><h3 id="stMonthPaid">₹0</h3></div>
+        </div>
+        <div class="grid-2">
+          <div class="panel"><div class="section-head"><div><h3>Quick Rent Entry</h3><p class="muted">Tenant select karke monthly rent save karo.</p></div></div><form id="quickRentForm" class="form-grid compact"></form></div>
+          <div class="panel"><div class="section-head"><div><h3>Pending Summary</h3><p class="muted">Jinke paise pending hain.</p></div></div><div id="pendingSummary" class="mini-list"></div></div>
+        </div>
+        <div class="panel"><div class="section-head"><div><h3>Recent Activity</h3><p class="muted">Latest saved records.</p></div></div><div id="recentActivity" class="activity-list"></div></div>
+      </section>
+
+      <section class="page" id="tenants">
+        <div class="panel"><div class="section-head"><div><h3>Add / Update Kirayedar</h3><p class="muted">Name, room, rent, deposit, mobile aur ID details save karo.</p></div><button class="ghost-btn" id="clearTenantBtn">Clear</button></div>
+          <form id="tenantForm" class="form-grid"><input type="hidden" id="tenantId" />
+            <label>Name *<input id="tenantName" required placeholder="Kirayedar ka naam" /></label>
+            <label>Mobile<input id="tenantMobile" placeholder="Mobile number" /></label>
+            <label>Room No *<input id="tenantRoom" required placeholder="Room number" /></label>
+            <label>Join Date<input id="tenantJoin" type="date" /></label>
+            <label>Monthly Rent<input id="tenantRent" type="number" min="0" placeholder="Monthly rent" /></label>
+            <label>Security Deposit<input id="tenantDeposit" type="number" min="0" placeholder="Security deposit" /></label>
+            <label>Aadhaar / ID No<input id="tenantIdProof" placeholder="Optional" /></label>
+            <label>Status<select id="tenantStatus"><option>Active</option><option>Left</option></select></label>
+            <label class="full">Address / Notes<textarea id="tenantNotes" placeholder="Address, family members, agreement note, etc."></textarea></label>
+            <button class="primary-btn" type="submit">Save Tenant</button>
+          </form>
+        </div>
+        <div class="panel"><div class="section-head"><h3>All Kirayedar</h3><input class="search" id="tenantSearch" placeholder="Search name, room, mobile..." /></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Room</th><th>Mobile</th><th>Rent</th><th>Deposit</th><th>Status</th><th>Action</th></tr></thead><tbody id="tenantTable"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="rooms">
+        <div class="panel"><div class="section-head"><div><h3>Room Master</h3><p class="muted">Rooms create karo aur vacant/occupied status track karo.</p></div><button class="ghost-btn" id="clearRoomBtn">Clear</button></div>
+          <form id="roomForm" class="form-grid"><input type="hidden" id="roomId" />
+            <label>Room No *<input id="roomNo" required placeholder="Room number" /></label><label>Floor<input id="roomFloor" placeholder="Floor" /></label><label>Default Rent<input id="roomRent" type="number" min="0" /></label><label>Status<select id="roomStatus"><option>Vacant</option><option>Occupied</option><option>Maintenance</option></select></label><label class="full">Room Note<textarea id="roomNote"></textarea></label><button class="primary-btn" type="submit">Save Room</button>
+          </form>
+        </div>
+        <div class="panel"><div class="section-head"><h3>All Rooms</h3><input class="search" id="roomSearch" placeholder="Search room..." /></div><div class="table-wrap"><table><thead><tr><th>Room</th><th>Floor</th><th>Rent</th><th>Status</th><th>Current Tenant</th><th>Action</th></tr></thead><tbody id="roomTable"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="rent">
+        <div class="panel"><div class="section-head"><div><h3>Rent Payment Entry</h3><p class="muted">Month wise rent paid/pending save karo.</p></div></div><form id="rentForm" class="form-grid"><input type="hidden" id="rentId" /><label>Tenant *<select id="rentTenant" required></select></label><label>Month *<input id="rentMonth" type="month" required /></label><label>Rent From Date *<input id="rentFrom" type="date" required /></label><label>Rent To Date *<input id="rentTo" type="date" required /></label><label>Rent Amount<input id="rentAmount" type="number" min="0" /></label><label>Paid Amount<input id="rentPaid" type="number" min="0" /></label><label>Payment Date<input id="rentDate" type="date" /></label><label>Mode<select id="rentMode"><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Other</option></select></label><label>Status<select id="rentStatus"><option>Paid</option><option>Partial</option><option>Pending</option></select></label><label class="full">Note<textarea id="rentNote"></textarea></label><button class="primary-btn" id="rentSubmitBtn" type="submit">Save Rent</button><button class="ghost-btn hidden" id="rentCancelEditBtn" type="button" onclick="clearRentEdit()">Cancel Edit</button></form></div>
+        <div class="panel"><div class="section-head"><h3>Rent History</h3><input class="search" id="rentSearch" placeholder="Search tenant, room, month..." /></div><div class="table-wrap"><table><thead><tr><th>Tenant</th><th>Room</th><th>Month</th><th>Period</th><th>Rent</th><th>Paid</th><th>Pending</th><th>Status</th><th>Receipt</th><th>Action</th></tr></thead><tbody id="rentTable"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="electricity">
+        <div class="panel"><div class="section-head"><div><h3>Electricity Reading / Bill</h3><p class="muted">Previous reading, current reading, units aur bill save karo.</p></div></div><form id="electricityForm" class="form-grid"><input type="hidden" id="elecId" /><label>Tenant / Room *<select id="elecTenant" required></select></label><label>Month *<input id="elecMonth" type="month" required /></label><label>Bill From Date *<input id="elecFrom" type="date" required /></label><label>Bill To Date *<input id="elecTo" type="date" required /></label><label>Previous Reading<input id="prevReading" type="number" min="0" required /></label><label>Current Reading<input id="currReading" type="number" min="0" required /></label><label>Rate / Unit<input id="rateUnit" type="number" min="0" value="8" required /></label><label>Total Bill<input id="elecTotal" type="number" readonly /></label><label>Paid Amount<input id="elecPaid" type="number" min="0" value="0" /></label><label>Status<select id="elecStatus"><option>Unpaid</option><option>Paid</option><option>Partial</option></select></label><label class="full">Note<textarea id="elecNote"></textarea></label><button class="primary-btn" id="elecSubmitBtn" type="submit">Save Electricity Bill</button><button class="ghost-btn hidden" id="elecCancelEditBtn" type="button" onclick="clearElecEdit()">Cancel Edit</button></form></div>
+        <div class="panel"><div class="section-head"><h3>Electricity History</h3><input class="search" id="elecSearch" placeholder="Search tenant, room, month..." /></div><div class="table-wrap"><table><thead><tr><th>Tenant</th><th>Room</th><th>Month</th><th>Period</th><th>Reading</th><th>Units</th><th>Total</th><th>Paid</th><th>Pending</th><th>Receipt</th><th>Action</th></tr></thead><tbody id="elecTable"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="charges">
+        <div class="panel"><div class="section-head"><div><h3>Other Bills / Charges</h3><p class="muted">Water bill, maintenance, repair, penalty ya custom charge.</p></div></div><form id="chargeForm" class="form-grid"><input type="hidden" id="chargeId" /><label>Tenant / Room *<select id="chargeTenant" required></select></label><label>Type<select id="chargeType"><option>Water Bill</option><option>Maintenance</option><option>Cleaning</option><option>Repair</option><option>Penalty</option><option>Other</option></select></label><label>Amount<input id="chargeAmount" type="number" min="0" required /></label><label>Paid Amount<input id="chargePaid" type="number" min="0" value="0" /></label><label>Date<input id="chargeDate" type="date" /></label><label>Status<select id="chargeStatus"><option>Unpaid</option><option>Paid</option><option>Partial</option></select></label><label class="full">Note<textarea id="chargeNote"></textarea></label><button class="primary-btn" id="chargeSubmitBtn" type="submit">Save Charge</button><button class="ghost-btn hidden" id="chargeCancelEditBtn" type="button" onclick="clearChargeEdit()">Cancel Edit</button></form></div>
+        <div class="panel"><div class="section-head"><h3>Charges History</h3><input class="search" id="chargeSearch" placeholder="Search..." /></div><div class="table-wrap"><table><thead><tr><th>Tenant</th><th>Room</th><th>Type</th><th>Amount</th><th>Paid</th><th>Pending</th><th>Status</th><th>Receipt</th><th>Action</th></tr></thead><tbody id="chargeTable"></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="reports">
+        <div class="panel"><div class="section-head"><div><h3>Reports</h3><p class="muted">Month/tenant wise report, pending aur collection.</p></div><button class="primary-btn" id="printReportBtn">Print Report</button></div><div class="form-grid compact"><label>Month<input id="reportMonth" type="month" /></label><label>Tenant<select id="reportTenant"><option value="all">All Tenants</option></select></label><button class="ghost-btn" id="clearReportBtn">Clear Filter</button></div></div>
+        <div class="stats-grid"><div class="stat-card"><p>Rent Paid</p><h3 id="rpRent">₹0</h3></div><div class="stat-card"><p>Electricity Paid</p><h3 id="rpElec">₹0</h3></div><div class="stat-card"><p>Other Paid</p><h3 id="rpCharge">₹0</h3></div><div class="stat-card warning"><p>Pending</p><h3 id="rpPending">₹0</h3></div></div>
+        <div class="panel"><h3>Detailed Report</h3><div id="reportDetails" class="report-list"></div></div>
+      </section>
+
+      <section class="page" id="backup">
+        <div class="panel"><div class="section-head"><div><h3>Backup / Export</h3><p class="muted">Apna database JSON me download karo ya local backup lo.</p></div></div><div class="action-row"><button class="primary-btn" id="downloadJsonBtn">Download JSON Backup</button><button class="ghost-btn" id="copyJsonBtn">Copy JSON</button><button class="danger-btn" id="clearLocalBtn">Logout + Clear Local Login</button></div><textarea id="backupBox" readonly class="backup-box"></textarea></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <div id="receiptModal" class="modal hidden"><div class="receipt-card"><button class="close-btn" id="closeReceipt">×</button><div id="receiptContent"></div><button class="primary-btn" id="printReceiptBtn">Print Receipt</button></div></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
